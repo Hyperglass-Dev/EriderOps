@@ -14,14 +14,14 @@ export function NavigationTab({ rideData, selectedScooter }: NavigationTabProps)
   const [rideMode, setRideMode] = useState<RideMode>('just-ride');
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-4">
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="p-4 flex-shrink-0">
         <RideModeSelector 
           selectedMode={rideMode} 
           onSelectMode={setRideMode}
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 overflow-hidden">
         <Directions 
           lat={rideData.position.lat} 
           lng={rideData.position.lng}

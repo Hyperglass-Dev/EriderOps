@@ -129,9 +129,9 @@ export function Directions({ lat, lng, rideMode, rideData, scooterModel }: Direc
   };
 
   return (
-    <>
+    <div className="h-full flex flex-col gap-2 px-4">
       {rideMode === 'directions' && (
-        <Card>
+        <Card className="flex-shrink-0">
           <CardContent className="p-4 flex flex-col md:flex-row gap-2">
             <Input 
               ref={originInputRef}
@@ -162,7 +162,7 @@ export function Directions({ lat, lng, rideMode, rideData, scooterModel }: Direc
       )}
       
       {rideMode === 'ai-pick' && (
-        <Card>
+        <Card className="flex-shrink-0">
           <CardContent className="p-4">
             <Button onClick={handleAIPickDestination} className="w-full">
               Let AI Pick My Destination
@@ -171,9 +171,9 @@ export function Directions({ lat, lng, rideMode, rideData, scooterModel }: Direc
         </Card>
       )}
 
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         <Map lat={lat} lng={lng} route={route} />
       </div>
-    </>
+    </div>
   );
 }

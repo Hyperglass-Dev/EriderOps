@@ -35,11 +35,13 @@ export default function DashboardPage() {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-          const defaultProfile = data.profiles[data.defaultProfile];
-          setSelectedScooter(defaultProfile.scooterModelId);
+          const defaultProfile = data.profiles?.[data.defaultProfile];
+          if (defaultProfile) {
+            setSelectedScooter(defaultProfile.scooterModelId);
+          }
         }
       } catch (error) {
-        console.error('Failed to load profile:', error);
+        console.warn('Profile not yet created or permissions issue:', error);
       } finally {
         setProfileLoading(false);
       }
