@@ -24,7 +24,11 @@ export function Weather({ rideData }: WeatherProps) {
         return;
     }
 
+    const abortController = new AbortController();
+    let isMounted = true;
+
     const fetchData = async () => {
+      if (!isMounted) return;
       setLoading(true);
       setFetchError(false);
       try {
@@ -41,6 +45,7 @@ export function Weather({ rideData }: WeatherProps) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ location }),
+          signal: abortController.signal,
         });
 
         if (!response.ok) {
@@ -64,21 +69,27 @@ export function Weather({ rideData }: WeatherProps) {
           setPollenData(data.pollen.dailyForecasts[0]);
         }
 
-      } catch (error) {
+      } catch (error: any) {
+        if (error.name === 'AbortError') return;
         console.error('Failed to fetch environmental data:', error);
-        setFetchError(true);
-        toast({
-          variant: 'destructive',
-          title: 'Failed to load live data',
-          description: 'Could not fetch weather, air quality, or pollen data.',
-        });
+        if (isMounted) {
+          setFetchError(true);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchData();
-  }, [rideData.position.lat, rideData.position.lng, toast]);
+    const timeoutId = setTimeout(fetchData, 500);
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [rideData.position.lat, rideData.position.lng]);
   
   if (loading) {
     return (

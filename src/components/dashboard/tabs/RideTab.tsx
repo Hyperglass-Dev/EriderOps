@@ -30,50 +30,47 @@ export function RideTab({ rideData, rideStatus, onStart, onPause, onStop, select
   };
 
   return (
-    <div className="h-full flex flex-col p-4 gap-4 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 gap-2 overflow-hidden">
       {/* Speed Display */}
-      <Card className="bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-4">
+      <Card className="bg-card/50 backdrop-blur-sm flex-shrink-0">
+        <CardContent className="p-3">
           <div className="text-center">
-            <div className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-2 mb-2">
-              <Gauge className="h-4 w-4" />
-              Speed
-            </div>
-            <div className="text-5xl font-bold font-headline text-primary">
+            <div className="text-xs font-medium text-muted-foreground mb-1">Speed</div>
+            <div className="text-4xl font-bold font-headline text-primary">
               {rideData.speed.toFixed(1)} 
-              <span className="text-xl text-muted-foreground ml-2">km/h</span>
+              <span className="text-lg text-muted-foreground ml-1">km/h</span>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Ride Stats */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 flex-shrink-0">
         <Card className="bg-card/50">
-          <CardContent className="p-4 text-center">
-            <Navigation className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
+          <CardContent className="p-2 text-center">
+            <Navigation className="h-3 w-3 mx-auto text-muted-foreground mb-1" />
             <div className="text-xs text-muted-foreground">Distance</div>
-            <div className="text-lg font-bold">{rideData.distance.toFixed(2)} km</div>
+            <div className="text-sm font-bold">{rideData.distance.toFixed(2)} km</div>
           </CardContent>
         </Card>
         <Card className="bg-card/50">
-          <CardContent className="p-4 text-center">
-            <Clock className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
+          <CardContent className="p-2 text-center">
+            <Clock className="h-3 w-3 mx-auto text-muted-foreground mb-1" />
             <div className="text-xs text-muted-foreground">Time</div>
-            <div className="text-lg font-bold">{formatTime(rideData.time)}</div>
+            <div className="text-sm font-bold">{formatTime(rideData.time)}</div>
           </CardContent>
         </Card>
         <Card className="bg-card/50">
-          <CardContent className="p-4 text-center">
-            <Mountain className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
+          <CardContent className="p-2 text-center">
+            <Mountain className="h-3 w-3 mx-auto text-muted-foreground mb-1" />
             <div className="text-xs text-muted-foreground">Elevation</div>
-            <div className="text-lg font-bold">{rideData.elevation.toFixed(0)} m</div>
+            <div className="text-sm font-bold">{rideData.elevation.toFixed(0)} m</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-3 py-2">
+      <div className="flex items-center justify-center gap-3 flex-shrink-0">
         {rideStatus === 'stopped' || rideStatus === 'paused' ? (
           <Button onClick={onStart} size="lg" className="h-14 px-8">
             <Play className="h-6 w-6 mr-2" />

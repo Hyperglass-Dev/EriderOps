@@ -74,8 +74,8 @@ export default function DashboardPage() {
         </Button>
       </header>
 
-      <Tabs defaultValue="ride" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 rounded-none border-b">
+      <Tabs defaultValue="ride" className="flex-1 flex flex-col overflow-hidden">
+        <TabsList className="grid w-full grid-cols-3 rounded-none border-b flex-shrink-0">
           <TabsTrigger value="ride" className="gap-2">
             <Activity className="h-4 w-4" />
             <span className="hidden sm:inline">Ride Data</span>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ride" className="flex-1 m-0">
+        <TabsContent value="ride" className="flex-1 m-0 overflow-hidden">
           <RideTab
             rideData={rideData}
             rideStatus={rideStatus}
@@ -101,14 +101,14 @@ export default function DashboardPage() {
           />
         </TabsContent>
 
-        <TabsContent value="navigation" className="flex-1 m-0">
+        <TabsContent value="navigation" className="flex-1 m-0 overflow-hidden">
           <NavigationTab
             rideData={rideData}
             selectedScooter={selectedScooter}
           />
         </TabsContent>
 
-        <TabsContent value="settings" className="flex-1 m-0">
+        <TabsContent value="settings" className="flex-1 m-0 overflow-hidden">
           <SettingsTab
             selectedScooter={selectedScooter}
             onSelectScooter={setSelectedScooter}
