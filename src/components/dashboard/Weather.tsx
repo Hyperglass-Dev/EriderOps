@@ -23,6 +23,9 @@ export function Weather({ rideData }: WeatherProps) {
   useEffect(() => {
     if (!API_KEY || API_KEY === "YOUR_API_KEY_HERE" || !rideData.position) {
         setLoading(false);
+        if (API_KEY && API_KEY !== "YOUR_API_KEY_HERE") {
+          setFetchError(true); // Show error if key is present but fetch is not possible (e.g. position not ready)
+        }
         return;
     }
 
@@ -130,12 +133,12 @@ export function Weather({ rideData }: WeatherProps) {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Live Data Fetch Failed</AlertTitle>
             <AlertDescription>
-              Could not load live environmental data. Please check your Google Cloud API key configuration, especially the HTTP referrers, and ensure the Weather, Air Quality, and Pollen APIs are enabled.
+              Could not load live environmental data. This is likely an API key configuration issue. Please check your Google Cloud project to ensure your API key is correctly set up with the right HTTP referrers and that the Weather, Air Quality, and Pollen APIs are enabled.
             </AlertDescription>
           </Alert>
         )}
 
-        {!fetchError && (
+        {(!fetchError && !loading) && (
           <>
             {weatherData ? (
               <>
