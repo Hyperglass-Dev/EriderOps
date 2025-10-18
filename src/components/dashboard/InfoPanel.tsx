@@ -3,7 +3,6 @@ import { ScooterSelector } from './ScooterSelector';
 import { BatteryIndicator } from './BatteryIndicator';
 import { Weather } from './Weather';
 import { GeofenceAlert } from './GeofenceAlert';
-import { CrashDetectionModal } from './CrashDetectionModal';
 import { AiAnalysis } from './AiAnalysis';
 import { Controls } from './Controls';
 import type { RideData, RideStatus } from '@/hooks/use-ride-simulation';
@@ -13,8 +12,6 @@ import { scooterModels } from '@/lib/scooter-data';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
 import { Slider } from '../ui/slider';
-import { useCrashDetection } from '@/hooks/use-crash-detection';
-
 type InfoPanelProps = {
   rideData: RideData;
   rideStatus: RideStatus;
@@ -28,15 +25,6 @@ type InfoPanelProps = {
 };
 
 export function InfoPanel(props: InfoPanelProps) {
-  const [crashModalOpen, setCrashModalOpen] = useState(false);
-  const { crashDetected, resetCrashDetection } = useCrashDetection(props.rideStatus === 'active');
-
-  useEffect(() => {
-    if (crashDetected) {
-      setCrashModalOpen(true);
-      resetCrashDetection();
-    }
-  }, [crashDetected, resetCrashDetection]);
   
   const scooterSpec = scooterModels.find(s => s.id === props.selectedScooter);
   const maxRange = scooterSpec ? (scooterSpec.batteryCapacityWh / scooterSpec.efficiencyWhKm) : 0;
@@ -83,7 +71,6 @@ export function InfoPanel(props: InfoPanelProps) {
       <Weather rideData={props.rideData} />
       <AiAnalysis rideData={props.rideData} scooterModel={props.selectedScooter} />
       <GeofenceAlert rideData={props.rideData} />
-      <CrashDetectionModal open={crashModalOpen} onOpenChange={setCrashModalOpen} />
     </aside>
   );
 }

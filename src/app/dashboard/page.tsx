@@ -5,20 +5,21 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Header } from '@/components/dashboard/Header';
-import { Directions } from '@/components/dashboard/Directions';
-import { InfoPanel } from '@/components/dashboard/InfoPanel';
-import { RideModeSelector, RideMode } from '@/components/dashboard/RideModeSelector';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Activity, Map, Settings, LogOut, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { RideTab } from '@/components/dashboard/tabs/RideTab';
+import { NavigationTab } from '@/components/dashboard/tabs/NavigationTab';
+import { SettingsTab } from '@/components/dashboard/tabs/SettingsTab';
 import { useRideSimulation } from '@/hooks/use-ride-simulation';
 import { scooterModels } from '@/lib/scooter-data';
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [selectedScooter, setSelectedScooter] = useState(scooterModels[0].id);
   const [initialBattery, setInitialBattery] = useState(100);
   const [profileLoading, setProfileLoading] = useState(true);
-  const [rideMode, setRideMode] = useState<RideMode>('just-ride');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -61,41 +62,61 @@ export default function DashboardPage() {
   
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <Header
-        speed={rideData.speed}
-        distance={rideData.distance}
-        time={rideData.time}
-        elevation={rideData.elevation}
-      />
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-        <div className="lg:col-span-2 h-[400px] lg:h-auto flex flex-col gap-4">
-          <RideModeSelector 
-            selectedMode={rideMode} 
-            onSelectMode={setRideMode}
-            disabled={rideStatus === 'active'}
-          />
-          <Directions 
-            lat={rideData.position.lat} 
-            lng={rideData.position.lng}
-            rideMode={rideMode}
-            rideData={rideData}
-            scooterModel={selectedScooter}
-          />
+      <header className="p-4 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Zap className="h-6 w-6 text-primary" />
+          <h1 className="text-xl font-headline font-bold">E-RiderOps</h1>
         </div>
-        <div className="lg:col-span-1 overflow-y-auto">
-          <InfoPanel
-            rideStatus={rideStatus}
+        <Button variant="ghost" size="sm" onClick={() => logout()}>
+          <LogOut className="h-4 w-4" />
+        </Button>
+      </header>
+
+      <Tabs defaultValue="ride" className="flex-1 flex flex-col">
+        <TabsList className="grid w-full grid-cols-3 rounded-none border-b">
+          <TabsTrigger value="ride" className="gap-2">
+            <Activity className="h-4 w-4" />
+            <span className="hidden sm:inline">Ride Data</span>
+          </TabsTrigger>
+          <TabsTrigger value="navigation" className="gap-2">
+            <Map className="h-4 w-4" />
+            <span className="hidden sm:inline">Navigation</span>
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">Settings</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="ride" className="flex-1 m-0">
+          <RideTab
             rideData={rideData}
+            rideStatus={rideStatus}
             onStart={startRide}
             onPause={pauseRide}
             onStop={stopRide}
             selectedScooter={selectedScooter}
+          />
+        </TabsContent>
+
+        <TabsContent value="navigation" className="flex-1 m-0">
+          <NavigationTab
+            rideData={rideData}
+            selectedScooter={selectedScooter}
+          />
+        </TabsContent>
+
+        <TabsContent value="settings" className="flex-1 m-0">
+          <SettingsTab
+            selectedScooter={selectedScooter}
             onSelectScooter={setSelectedScooter}
             initialBattery={initialBattery}
             onSetInitialBattery={setInitialBattery}
+            rideStatus={rideStatus}
+            rideData={rideData}
           />
-        </div>
-      </main>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
