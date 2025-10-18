@@ -41,7 +41,7 @@ export function Directions({ lat, lng }: { lat: number; lng: number }) {
         travelMode: travelMode as google.maps.TravelMode,
       },
       (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK && response) {
+        if (status === 'OK' && response) {
           setRoute(response);
         } else {
             toast({
@@ -71,12 +71,12 @@ export function Directions({ lat, lng }: { lat: number; lng: number }) {
             className="flex-1"
           />
           <Select onValueChange={(value) => setTravelMode(value)} defaultValue={travelMode}>
-              <SelectTrigger className="w-full md:w-[180px]">
+              <SelectTrigger className="w-full md:w-[240px]">
                   <SelectValue placeholder="Travel Mode" />
               </SelectTrigger>
               <SelectContent>
                   <SelectItem value="TWO_WHEELER">E-Scooter</SelectItem>
-                  <SelectItem value="TRANSIT">Transit</SelectItem>
+                  <SelectItem value="TRANSIT">E-Scooter & Transit</SelectItem>
               </SelectContent>
           </Select>
           <Button onClick={handleGetDirections}>Get Directions</Button>
