@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { Wind, Thermometer, Cloud, Trees, Droplets, Sun } from 'lucide-react';
+import { Wind, Thermometer, Cloud, Trees, Sun } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { RideData } from '@/hooks/use-ride-simulation';
@@ -38,7 +38,7 @@ export function Weather({ rideData }: WeatherProps) {
         };
 
         // Fetch all data in parallel
-        const [weatherRes, airQualityRes, pollenRes] = await Promise.all([
+        const [weatherRes, airQualityRes, pollenRes] = await Promise.allSettled([
           fetch('https://weather.googleapis.com/v1/currentConditions:lookup', {
             method: 'POST',
             headers,
@@ -56,26 +56,26 @@ export function Weather({ rideData }: WeatherProps) {
           }),
         ]);
 
-        if (weatherRes.ok) {
-            const data = await weatherRes.json();
+        if (weatherRes.status === 'fulfilled' && weatherRes.value.ok) {
+            const data = await weatherRes.value.json();
             setWeatherData(data);
         } else {
-            console.error("Failed to fetch weather data");
+            console.error("Failed to fetch weather data", weatherRes.status === 'fulfilled' ? await weatherRes.value.text() : weatherRes.reason);
         }
 
-        if (airQualityRes.ok) {
-            const data = await airQualityRes.json();
+        if (airQualityRes.status === 'fulfilled' && airQualityRes.value.ok) {
+            const data = await airQualityRes.value.json();
             setAirQualityData(data);
         } else {
-             console.error("Failed to fetch air quality data");
+             console.error("Failed to fetch air quality data", airQualityRes.status === 'fulfilled' ? await airQualityRes.value.text() : airQualityRes.reason);
         }
 
-        if (pollenRes.ok) {
-            const data = await pollenRes.json();
+        if (pollenRes.status === 'fulfilled' && pollenRes.value.ok) {
+            const data = await pollenRes.value.json();
             // We only care about the first day forecast
             setPollenData(data.dailyForecasts[0]);
         } else {
-             console.error("Failed to fetch pollen data");
+             console.error("Failed to fetch pollen data", pollenRes.status === 'fulfilled' ? await pollenRes.value.text() : pollenRes.reason);
         }
 
       } catch (error) {
