@@ -6,8 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { RideData } from '@/hooks/use-ride-simulation';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-
 type WeatherProps = {
     rideData: RideData
 }
@@ -21,11 +19,8 @@ export function Weather({ rideData }: WeatherProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!API_KEY || API_KEY === "YOUR_API_KEY_HERE" || !rideData.position) {
+    if (!rideData.position) {
         setLoading(false);
-        if (API_KEY && API_KEY !== "YOUR_API_KEY_HERE") {
-          setFetchError(true); // Show error if key is present but fetch is not possible (e.g. position not ready)
-        }
         return;
     }
 
@@ -33,64 +28,40 @@ export function Weather({ rideData }: WeatherProps) {
       setLoading(true);
       setFetchError(false);
       try {
-        const headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": API_KEY
-        };
-        
         const location = {
             "latitude": rideData.position.lat,
             "longitude": rideData.position.lng
         };
 
-        // Fetch all data in parallel
-        const [weatherRes, airQualityRes, pollenRes] = await Promise.allSettled([
-          fetch('https://weather.googleapis.com/v1/currentConditions:lookup', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ location }),
-          }),
-          fetch('https://airquality.googleapis.com/v1/currentConditions:lookup', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ location }),
-          }),
-          fetch('https://pollen.googleapis.com/v1/forecast:lookup?days=1', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ location }),
-          }),
-        ]);
+        console.log('Fetching weather for location:', location);
 
-        let hasAnyError = false;
+        const response = await fetch('/api/weather', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ location }),
+        });
 
-        if (weatherRes.status === 'fulfilled' && weatherRes.value.ok) {
-            const data = await weatherRes.value.json();
-            setWeatherData(data);
-        } else {
-            console.error("Failed to fetch weather data", weatherRes.status === 'fulfilled' ? await weatherRes.value.text() : weatherRes.reason);
-            hasAnyError = true;
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Weather API error:', response.status, errorText);
+          throw new Error('Failed to fetch weather data');
         }
 
-        if (airQualityRes.status === 'fulfilled' && airQualityRes.value.ok) {
-            const data = await airQualityRes.value.json();
-            setAirQualityData(data);
-        } else {
-             console.error("Failed to fetch air quality data", airQualityRes.status === 'fulfilled' ? await airQualityRes.value.text() : airQualityRes.reason);
-             hasAnyError = true;
+        const data = await response.json();
+        console.log('Weather API response:', data);
+
+        if (data.weather) {
+          setWeatherData(data.weather);
         }
 
-        if (pollenRes.status === 'fulfilled' && pollenRes.value.ok) {
-            const data = await pollenRes.value.json();
-            // We only care about the first day forecast
-            setPollenData(data.dailyForecasts[0]);
-        } else {
-             console.error("Failed to fetch pollen data", pollenRes.status === 'fulfilled' ? await pollenRes.value.text() : pollenRes.reason);
-             hasAnyError = true;
+        if (data.airQuality) {
+          setAirQualityData(data.airQuality);
         }
 
-        if (hasAnyError) {
-          setFetchError(true);
+        if (data.pollen && data.pollen.dailyForecasts) {
+          setPollenData(data.pollen.dailyForecasts[0]);
         }
 
       } catch (error) {

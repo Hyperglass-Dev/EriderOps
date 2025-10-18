@@ -20,6 +20,7 @@ const INITIAL_LNG = -118.243683;
 export function useRideSimulation(scooterId: string, initialBattery: number) {
   const [rideStatus, setRideStatus] = useState<RideStatus>('stopped');
   const [scooterSpec, setScooterSpec] = useState<ScooterModel | undefined>(scooterModels.find(s => s.id === scooterId));
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   
   const [rideData, setRideData] = useState<RideData>({
     speed: 0,
@@ -29,6 +30,27 @@ export function useRideSimulation(scooterId: string, initialBattery: number) {
     position: { lat: INITIAL_LAT, lng: INITIAL_LNG },
     battery: initialBattery,
   });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(location);
+          setRideData(prev => ({
+            ...prev,
+            position: location,
+          }));
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     setScooterSpec(scooterModels.find(s => s.id === scooterId));
@@ -78,12 +100,13 @@ export function useRideSimulation(scooterId: string, initialBattery: number) {
         });
       }, 1000);
     } else if (rideStatus === 'stopped') {
+        const resetPosition = userLocation || { lat: INITIAL_LAT, lng: INITIAL_LNG };
         setRideData({
             speed: 0,
             distance: 0,
             time: 0,
             elevation: 25,
-            position: { lat: INITIAL_LAT, lng: INITIAL_LNG },
+            position: resetPosition,
             battery: initialBattery,
         });
     } else if (rideStatus === 'paused') {
@@ -96,17 +119,17 @@ export function useRideSimulation(scooterId: string, initialBattery: number) {
   }, [rideStatus, scooterSpec, initialBattery]);
 
   const startRide = useCallback(() => {
-     // When starting a new ride, reset data but keep the initial battery level
+     const resetPosition = userLocation || { lat: INITIAL_LAT, lng: INITIAL_LNG };
      setRideData(prev => ({
       speed: 0,
       distance: 0,
       time: 0,
       elevation: 25,
-      position: { lat: INITIAL_LAT, lng: INITIAL_LNG },
-      battery: prev.battery, // Keep the user-set battery level
+      position: resetPosition,
+      battery: prev.battery,
     }));
     setRideStatus('active')
-  }, []);
+  }, [userLocation]);
 
   const pauseRide = useCallback(() => setRideStatus('paused'), []);
   const stopRide = useCallback(() => setRideStatus('stopped'), []);
@@ -118,19 +141,19 @@ export function useRideSimulation(scooterId: string, initialBattery: number) {
   }, [rideStatus]);
 
 
-  // Effect to reset ride data when initialBattery changes, but only when stopped.
   useEffect(() => {
     if (rideStatus === 'stopped') {
+      const resetPosition = userLocation || { lat: INITIAL_LAT, lng: INITIAL_LNG };
       setRideData({
         speed: 0,
         distance: 0,
         time: 0,
         elevation: 25,
-        position: { lat: INITIAL_LAT, lng: INITIAL_LNG },
+        position: resetPosition,
         battery: initialBattery,
       });
     }
-  }, [initialBattery, rideStatus]);
+  }, [initialBattery, rideStatus, userLocation]);
 
   return { rideStatus, rideData, startRide, pauseRide, stopRide, setInitialBattery };
 }

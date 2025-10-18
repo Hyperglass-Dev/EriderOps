@@ -8,11 +8,12 @@ import { AiAnalysis } from './AiAnalysis';
 import { Controls } from './Controls';
 import type { RideData, RideStatus } from '@/hooks/use-ride-simulation';
 import { Button } from '../ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { scooterModels } from '@/lib/scooter-data';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
 import { Slider } from '../ui/slider';
+import { useCrashDetection } from '@/hooks/use-crash-detection';
 
 type InfoPanelProps = {
   rideData: RideData;
@@ -28,6 +29,14 @@ type InfoPanelProps = {
 
 export function InfoPanel(props: InfoPanelProps) {
   const [crashModalOpen, setCrashModalOpen] = useState(false);
+  const { crashDetected, resetCrashDetection } = useCrashDetection(props.rideStatus === 'active');
+
+  useEffect(() => {
+    if (crashDetected) {
+      setCrashModalOpen(true);
+      resetCrashDetection();
+    }
+  }, [crashDetected, resetCrashDetection]);
   
   const scooterSpec = scooterModels.find(s => s.id === props.selectedScooter);
   const maxRange = scooterSpec ? (scooterSpec.batteryCapacityWh / scooterSpec.efficiencyWhKm) : 0;
@@ -74,9 +83,6 @@ export function InfoPanel(props: InfoPanelProps) {
       <Weather rideData={props.rideData} />
       <AiAnalysis rideData={props.rideData} scooterModel={props.selectedScooter} />
       <GeofenceAlert rideData={props.rideData} />
-      <Button variant="destructive" onClick={() => setCrashModalOpen(true)}>
-        Simulate Crash
-      </Button>
       <CrashDetectionModal open={crashModalOpen} onOpenChange={setCrashModalOpen} />
     </aside>
   );

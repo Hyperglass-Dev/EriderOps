@@ -12,8 +12,7 @@ import { Button } from "@/components/ui/button"
 
 export function CrashDetectionModal({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const handleEmergencyCall = () => {
-    // In a real app, this would initiate a call
-    console.log("Calling emergency services...");
+    window.location.href = "tel:000";
     onOpenChange(false);
   };
   

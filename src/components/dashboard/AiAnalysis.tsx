@@ -11,10 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { analyzeRideAndSuggest } from '@/ai/flows/ride-analysis-and-suggestions';
 import { useToast } from '@/hooks/use-toast';
 import type { RideData } from '@/hooks/use-ride-simulation';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { scooterModels } from '@/lib/scooter-data';
 
 type AiAnalysisProps = {
   rideData: RideData;
@@ -30,20 +30,52 @@ export function AiAnalysis({ rideData, scooterModel }: AiAnalysisProps) {
     setIsLoading(true);
     setAnalysis('');
     try {
-      const rideDataString = `Distance: ${rideData.distance.toFixed(2)} km, Time: ${rideData.time}s, Avg Speed: ${(rideData.distance / (rideData.time / 3600) || 0).toFixed(1)} km/h, Elevation change: some data.`;
-      const result = await analyzeRideAndSuggest({
-        rideData: rideDataString,
-        weatherConditions: 'Temperature: 18°C, Wind: 12 km/h NW, Partly Cloudy',
-        scooterModel: scooterModel,
+      const scooterSpec = scooterModels.find(s => s.id === scooterModel);
+      const avgSpeed = rideData.time > 0 ? (rideData.distance / (rideData.time / 3600)).toFixed(1) : '0';
+      const estimatedEnergyUsed = scooterSpec 
+        ? (rideData.distance * scooterSpec.efficiencyWhKm).toFixed(0)
+        : 'unknown';
+      
+      const rideDataString = JSON.stringify({
+        distance_km: rideData.distance.toFixed(2),
+        time_seconds: rideData.time,
+        avg_speed_kmh: avgSpeed,
+        elevation_m: rideData.elevation.toFixed(1),
+        battery_remaining_pct: rideData.battery.toFixed(0),
+        estimated_energy_used_wh: estimatedEnergyUsed,
+      }, null, 2);
+
+      const scooterModelString = scooterSpec 
+        ? `${scooterSpec.brand} ${scooterSpec.name} (${scooterSpec.batteryCapacityWh}Wh battery, ${scooterSpec.efficiencyWhKm}Wh/km efficiency)`
+        : scooterModel;
+
+      const response = await fetch('/api/assistant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Analyze my ride and provide insights and suggestions.',
+          rideData: rideDataString,
+          scooterModel: scooterModelString,
+          weatherConditions: 'Current weather conditions',
+        }),
       });
-      setAnalysis(result.suggestions);
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI analysis');
+      }
+
+      const data = await response.json();
+      setAnalysis(data.response);
     } catch (error) {
       console.error('AI analysis failed:', error);
       toast({
         variant: 'destructive',
         title: 'AI Analysis Failed',
-        description: 'Could not generate ride suggestions. Please try again.',
+        description: 'Could not generate ride suggestions. Please check your OpenAI configuration.',
       });
+      setAnalysis('');
     } finally {
       setIsLoading(false);
     }
