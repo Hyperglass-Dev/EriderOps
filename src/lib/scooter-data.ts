@@ -24,6 +24,7 @@ export const scooterModels: ScooterModel[] = [
   // Kaabo
   { id: 'kaabo-mantis-king-gt', name: 'Mantis King GT', brand: 'Kaabo', batteryCapacityWh: 1440, efficiencyWhKm: 24 },
   { id: 'kaabo-wolf-warrior-x-gt', name: 'Wolf Warrior X GT', brand: 'Kaabo', batteryCapacityWh: 1260, efficiencyWhKm: 26 },
+  { id: 'kaabo-wolf-warrior-x-plus', name: 'Wolf Warrior X Plus', brand: 'Kaabo', batteryCapacityWh: 1260, efficiencyWhKm: 26 },
   { id: 'kaabo-wolf-king-gt', name: 'Wolf King GT', brand: 'Kaabo', batteryCapacityWh: 2520, efficiencyWhKm: 30 },
   { id: 'kaabo-mantis-8', name: 'Mantis 8', brand: 'Kaabo', batteryCapacityWh: 800, efficiencyWhKm: 19 },
   { id: 'kaabo-skywalker-8s', name: 'Skywalker 8S', brand: 'Kaabo', batteryCapacityWh: 624, efficiencyWhKm: 17 },
