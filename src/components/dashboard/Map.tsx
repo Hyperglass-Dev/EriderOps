@@ -1,10 +1,21 @@
 'use client';
 import { APIProvider, Map as GoogleMap, AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_GOOGLE_MAPS_API_KEY_HERE";
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 export function Map({ lat, lng }: { lat: number, lng: number }) {
   const position = { lat, lng };
+
+  if (!API_KEY) {
+    return (
+      <div className="h-full w-full rounded-lg overflow-hidden border border-primary/20 bg-muted flex items-center justify-center">
+        <div className="text-center p-4">
+          <p className="font-bold text-lg">Google Maps API Key Missing</p>
+          <p className="text-sm text-muted-foreground">Please add your NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to the .env file.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden border border-primary/20">
