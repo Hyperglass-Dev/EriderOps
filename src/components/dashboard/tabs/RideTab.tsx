@@ -33,16 +33,16 @@ export function RideTab({ rideData, rideStatus, onStart, onPause, onStop, select
     <div className="h-full flex flex-col p-4 gap-4 overflow-y-auto">
       {/* Speed Display */}
       <Card className="bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <CardContent className="p-4">
+          <div className="text-center">
+            <div className="text-sm font-medium text-muted-foreground flex items-center justify-center gap-2 mb-2">
               <Gauge className="h-4 w-4" />
               Speed
-            </span>
-          </div>
-          <div className="text-5xl font-bold font-headline text-primary">
-            {rideData.speed.toFixed(1)} 
-            <span className="text-xl text-muted-foreground ml-2">km/h</span>
+            </div>
+            <div className="text-5xl font-bold font-headline text-primary">
+              {rideData.speed.toFixed(1)} 
+              <span className="text-xl text-muted-foreground ml-2">km/h</span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -73,18 +73,21 @@ export function RideTab({ rideData, rideStatus, onStart, onPause, onStop, select
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center gap-4 py-4">
+      <div className="flex items-center justify-center gap-3 py-2">
         {rideStatus === 'stopped' || rideStatus === 'paused' ? (
-          <Button onClick={onStart} size="lg" className="rounded-full w-20 h-20">
-            <Play className="h-10 w-10" />
+          <Button onClick={onStart} size="lg" className="h-14 px-8">
+            <Play className="h-6 w-6 mr-2" />
+            Start
           </Button>
         ) : (
-          <Button onClick={onPause} size="lg" variant="secondary" className="rounded-full w-20 h-20">
-            <Pause className="h-10 w-10" />
+          <Button onClick={onPause} size="lg" variant="secondary" className="h-14 px-8">
+            <Pause className="h-6 w-6 mr-2" />
+            Pause
           </Button>
         )}
-        <Button onClick={onStop} size="lg" variant="destructive" className="rounded-full w-20 h-20" disabled={rideStatus === 'stopped'}>
-          <StopCircle className="h-10 w-10" />
+        <Button onClick={onStop} size="lg" variant="destructive" className="h-14 px-8" disabled={rideStatus === 'stopped'}>
+          <StopCircle className="h-6 w-6 mr-2" />
+          Stop
         </Button>
       </div>
 
