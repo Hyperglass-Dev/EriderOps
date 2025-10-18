@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Map } from './Map';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,14 +13,43 @@ export function Directions({ lat, lng }: { lat: number; lng: number }) {
   const [destination, setDestination] = useState('');
   const [travelMode, setTravelMode] = useState('TWO_WHEELER');
   const [route, setRoute] = useState<google.maps.DirectionsResult | null>(null);
+  
   const routesLibrary = useMapsLibrary('routes');
+  const placesLibrary = useMapsLibrary('places');
+
   const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
+  
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
+
   const { toast } = useToast();
 
   useEffect(() => {
     if (!routesLibrary) return;
     setDirectionsService(new routesLibrary.DirectionsService());
   }, [routesLibrary]);
+
+  useEffect(() => {
+    if (!placesLibrary || !originInputRef.current || !destinationInputRef.current) return;
+
+    const autocompleteOrigin = new placesLibrary.Autocomplete(originInputRef.current);
+    const autocompleteDestination = new placesLibrary.Autocomplete(destinationInputRef.current);
+
+    autocompleteOrigin.addListener('place_changed', () => {
+        const place = autocompleteOrigin.getPlace();
+        if (place.formatted_address) {
+            setOrigin(place.formatted_address);
+        }
+    });
+
+    autocompleteDestination.addListener('place_changed', () => {
+        const place = autocompleteDestination.getPlace();
+        if (place.formatted_address) {
+            setDestination(place.formatted_address);
+        }
+    });
+
+  }, [placesLibrary]);
 
   const handleGetDirections = useCallback(() => {
     if (!directionsService || !origin || !destination) {
@@ -59,12 +88,14 @@ export function Directions({ lat, lng }: { lat: number; lng: number }) {
       <Card>
         <CardContent className="p-4 flex flex-col md:flex-row gap-2">
           <Input 
+            ref={originInputRef}
             placeholder="From" 
             value={origin} 
             onChange={e => setOrigin(e.target.value)} 
             className="flex-1"
           />
           <Input 
+            ref={destinationInputRef}
             placeholder="To" 
             value={destination} 
             onChange={e => setDestination(e.target.value)}

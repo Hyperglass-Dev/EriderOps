@@ -20,7 +20,7 @@ export function Map({ lat, lng, route }: { lat: number, lng: number, route: goog
 
   return (
     <div className="h-full w-full rounded-lg overflow-hidden border border-primary/20">
-      <APIProvider apiKey={API_KEY}>
+      <APIProvider apiKey={API_KEY} libraries={['routes', 'places']}>
         <GoogleMap
           defaultCenter={position}
           defaultZoom={15}
