@@ -71,7 +71,7 @@ export function InfoPanel(props: InfoPanelProps) {
       </Card>
       
       <BatteryIndicator batteryLevel={props.rideData.battery} estimatedRange={estimatedRange} />
-      <Weather />
+      <Weather rideData={props.rideData} />
       <AiAnalysis rideData={props.rideData} scooterModel={props.selectedScooter} />
       <GeofenceAlert rideData={props.rideData} />
       <Button variant="destructive" onClick={() => setCrashModalOpen(true)}>
