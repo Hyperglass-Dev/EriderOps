@@ -6,7 +6,7 @@ const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 export function Map({ lat, lng }: { lat: number, lng: number }) {
   const position = { lat, lng };
 
-  if (!API_KEY) {
+  if (!API_KEY || API_KEY === "YOUR_API_KEY_HERE") {
     return (
       <div className="h-full w-full rounded-lg overflow-hidden border border-primary/20 bg-muted flex items-center justify-center">
         <div className="text-center p-4">
