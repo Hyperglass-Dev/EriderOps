@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Header } from '@/components/dashboard/Header';
-import { Map } from '@/components/dashboard/Map';
+import { Directions } from '@/components/dashboard/Directions';
 import { InfoPanel } from '@/components/dashboard/InfoPanel';
 import { useRideSimulation } from '@/hooks/use-ride-simulation';
 import { scooterModels } from '@/lib/scooter-data';
@@ -22,8 +22,8 @@ export default function DashboardPage() {
         elevation={rideData.elevation}
       />
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-        <div className="lg:col-span-2 h-[400px] lg:h-auto">
-          <Map lat={rideData.position.lat} lng={rideData.position.lng} />
+        <div className="lg:col-span-2 h-[400px] lg:h-auto flex flex-col gap-4">
+          <Directions lat={rideData.position.lat} lng={rideData.position.lng} />
         </div>
         <div className="lg:col-span-1 overflow-y-auto">
           <InfoPanel
