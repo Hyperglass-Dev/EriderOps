@@ -1,0 +1,11 @@
+[[build.environment]]
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
